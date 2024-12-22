@@ -1,38 +1,41 @@
-// URL da API do ImgBB
-const apiKey = "e8352eed09465a8ae69f73a2809a9b12"; // Substitua com sua chave da API ImgBB
+// Configuração do ImgBB API (substitua com sua chave da API do ImgBB)
+const imgbbApiKey = 'e8352eed09465a8ae69f73a2809a9b12'; 
 
-// Referência para a galeria de imagens
-const gallery = document.getElementById("gallery");
-
-// Função para enviar as imagens para o ImgBB
-async function uploadImage(file) {
+// Função para upload de fotos para o ImgBB
+async function uploadImageToImgBB(file) {
   const formData = new FormData();
-  formData.append("image", file);
+  formData.append('image', file);
 
-  // Enviar a imagem para o ImgBB
-  const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-    method: "POST",
-    body: formData
+  const response = await fetch('https://api.imgbb.com/1/upload?key=' + imgbbApiKey, {
+    method: 'POST',
+    body: formData,
   });
 
-  const data = await response.json();
+  const result = await response.json();
 
-  if (response.ok && data.data.url) {
-    // Criar o elemento da imagem e adicionar à galeria
-    const img = document.createElement("img");
-    img.src = data.data.url; // URL da imagem carregada
-    gallery.appendChild(img);
+  if (result.success) {
+    // Retorna a URL da imagem enviada
+    return result.data.url;
   } else {
-    console.error("Erro ao enviar a imagem:", data.error);
+    console.error('Erro ao enviar a imagem:', result.error);
   }
 }
 
-// Função para lidar com o envio de imagens
-document.getElementById("uploadForm").addEventListener("submit", (event) => {
+// Função para lidar com o envio de fotos no formulário
+document.getElementById('uploadForm').addEventListener('submit', async (event) => {
   event.preventDefault();
-  const files = document.getElementById("photoInput").files;
   
+  const files = document.getElementById('photoInput').files;
   for (let i = 0; i < files.length; i++) {
-    uploadImage(files[i]);
+    const imageUrl = await uploadImageToImgBB(files[i]);
+    
+    // Exibe a imagem na galeria
+    if (imageUrl) {
+      const gallery = document.getElementById('gallery');
+      const img = document.createElement('img');
+      img.src = imageUrl;
+      img.alt = 'Foto enviada';
+      gallery.appendChild(img);
+    }
   }
 });
