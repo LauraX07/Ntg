@@ -31,11 +31,30 @@ document.getElementById('uploadForm').addEventListener('submit', async (event) =
     
     // Exibe a imagem na galeria
     if (imageUrl) {
-      const gallery = document.getElementById('gallery');
-      const img = document.createElement('img');
-      img.src = imageUrl;
-      img.alt = 'Foto enviada';
-      gallery.appendChild(img);
+      // Salva a URL da imagem no localStorage
+      let gallery = JSON.parse(localStorage.getItem('gallery')) || [];
+      gallery.push(imageUrl);
+      localStorage.setItem('gallery', JSON.stringify(gallery));
+
+      // Atualiza a galeria na página
+      updateGallery();
     }
   }
 });
+
+// Função para exibir as imagens salvas no localStorage
+function updateGallery() {
+  const gallery = JSON.parse(localStorage.getItem('gallery')) || [];
+  const galleryContainer = document.getElementById('gallery');
+  galleryContainer.innerHTML = '';  // Limpa a galeria antes de adicionar as imagens
+
+  gallery.forEach(imageUrl => {
+    const imgElement = document.createElement('img');
+    imgElement.src = imageUrl;
+    imgElement.alt = 'Imagem compartilhada';
+    galleryContainer.appendChild(imgElement);
+  });
+}
+
+// Chama a função para exibir as imagens salvas quando a página carregar
+window.onload = updateGallery;
